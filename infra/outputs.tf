@@ -23,7 +23,7 @@ output "storage_account_names" {
 # ── GitHub Actions secrets cheat-sheet ───────────────────────────────────────
 output "github_secrets_summary" {
   description = "Copy-paste values for GitHub Actions secrets."
-  value = <<-EOT
+  value       = <<-EOT
     ── GitHub Actions Secrets ──────────────────────────────────────
     AZURE_RESOURCE_GROUP          = ${azurerm_resource_group.portfolio.name}
     AZURE_STORAGE_ACCOUNT_TEST    = ${azurerm_storage_account.env["test"].name}

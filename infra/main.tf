@@ -13,16 +13,16 @@ terraform {
   # Then fill in the values below from the bootstrap output.
   backend "azurerm" {
     resource_group_name  = "rg-portfolio-tfstate"
-    storage_account_name = "tfstatehendivalentino"   # change if you renamed it
+    storage_account_name = "tfstatehendivalentino" # change if you renamed it
     container_name       = "tfstate"
     key                  = "portfolio.tfstate"
-    use_oidc             = true   # uses GitHub OIDC — no static credentials needed
+    use_oidc             = true # uses GitHub OIDC — no static credentials needed
   }
 }
 
 provider "azurerm" {
   features {}
-  use_oidc = true   # authenticates via GitHub OIDC in CI; az login locally
+  use_oidc = true # authenticates via GitHub OIDC in CI; az login locally
 }
 
 # ── Resource Group ────────────────────────────────────────────────────────────

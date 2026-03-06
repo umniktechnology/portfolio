@@ -7,12 +7,12 @@ resource "azurerm_storage_account" "env" {
   location            = azurerm_resource_group.portfolio.location
 
   account_tier             = "Standard"
-  account_replication_type = "LRS"    # cheapest; upgrade to ZRS/GRS for prod if needed
+  account_replication_type = "LRS" # cheapest; upgrade to ZRS/GRS for prod if needed
   account_kind             = "StorageV2"
 
   # Security hardening
-  min_tls_version           = "TLS1_2"
-  allow_nested_items_to_be_public = false   # blobs not publicly listable by default
+  min_tls_version                 = "TLS1_2"
+  allow_nested_items_to_be_public = false # blobs not publicly listable by default
   https_traffic_only_enabled      = true
 
   # Static website hosting
