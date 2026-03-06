@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -43,13 +44,10 @@ export default function About() {
               /*
                * Swap the inner div with a Next.js Image component when you have a photo:
                *   import Image from 'next/image'
-               *   <Image src="/avatar.jpg" alt="Hendi Valentino" width={160} height={160} className="object-cover w-full h-full" priority />
+               *   <Image src="/hendi.jpg" alt="Hendi Valentino" width={160} height={160} className="object-cover w-full h-full" priority />
                */
             >
-              {/* Inner circle to create the ring effect */}
-              <div className="w-full h-full rounded-full bg-surface flex items-center justify-center text-3xl font-semibold text-secondary">
-                HV
-              </div>
+              <Image src="/hendi.jpg" alt="Hendi Valentino" width={160} height={160} className="object-cover w-full h-full rounded-full" priority />
             </div>
           </div>
 

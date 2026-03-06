@@ -30,6 +30,7 @@ output "github_secrets_summary" {
     AZURE_STORAGE_ACCOUNT_PROD    = ${azurerm_storage_account.env["prod"].name}
 
     ── Live URLs ────────────────────────────────────────────────────
+
     TEST  = ${azurerm_storage_account.env["test"].primary_web_endpoint}
     PROD  = ${azurerm_storage_account.env["prod"].primary_web_endpoint}
     ────────────────────────────────────────────────────────────────
