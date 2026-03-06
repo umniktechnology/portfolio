@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Design tokens ──────────────────────────────────────────── */
+:root {
+  --background: #0a0a0a;
+  --surface: #111111;
+  --surface-2: #161616;
+  --accent: #6366f1;
+  --accent-hover: #818cf8;
+  --cyan: #06b6d4;
+  --violet: #8b5cf6;
+  --emerald: #10b981;
+  --rose: #f43f5e;
+  --amber: #f59e0b;
+  --secondary: #a1a1aa;
+  --border: rgba(255, 255, 255, 0.07);
+}
+
+/* ─── Gradient text utility ──────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #e0e0ff 0%, #a5b4fc 40%, #67e8f9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-accent {
+  background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 50%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Base ───────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  /* Prevent layout shift on scrollbar appear */
+  scrollbar-gutter: stable;
+}
+
+body {
+  background-color: var(--background);
+  color: #f4f4f5;
+  font-feature-settings: 'rlig' 1, 'calt' 1;
+}
+
+/* ─── Custom scrollbar ───────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* ─── Focus ring ─────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ─── Selection ──────────────────────────────────────────────── */
+::selection {
+  background: rgba(99, 102, 241, 0.3);
+  color: #fff;
+}

@@ -1,0 +1,80 @@
+# ─────────────────────────────────────────────────────────────────
+# Deploy — TEST environment
+#
+# Trigger : push to `test` branch  OR  manual dispatch
+# Target  : Azure Storage Account (static website) — test
+#           + Azure CDN purge so testers always see latest build
+# ─────────────────────────────────────────────────────────────────
+name: Deploy — TEST
+
+on:
+  push:
+    branches: [test]
+  workflow_dispatch:   # allow manual promotion from GitHub UI
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  deploy:
+    name: Build & Deploy to TEST
+    runs-on: ubuntu-latest
+    environment: test              # GitHub Environment (no approval gate by default;
+                                   # you can add required reviewers in repo Settings)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build (static export → out/)
+        run: npm run build
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Upload to Azure Blob Storage (TEST)
+        run: |
+          az storage blob upload-batch \
+            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_TEST }} \
+            --auth-mode login \
+            --source out/ \
+            --destination '$web' \
+            --overwrite true
+
+      # ── Purge CDN so testers don't see cached old version ─────────
+      # Only runs if CDN secrets are present (CDN is optional for TEST)
+      - name: Purge Azure CDN cache (TEST)
+        if: ${{ secrets.AZURE_CDN_ENDPOINT_TEST != '' }}
+        run: |
+          az cdn endpoint purge \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --profile-name ${{ secrets.AZURE_CDN_PROFILE_NAME }} \
+            --name ${{ secrets.AZURE_CDN_ENDPOINT_TEST }} \
+            --content-paths "/*"
+
+      - name: Print TEST URL
+        run: |
+          echo "✅ Deployed to TEST:"
+          az storage account show \
+            --name ${{ secrets.AZURE_STORAGE_ACCOUNT_TEST }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --query "primaryEndpoints.web" \
+            --output tsv
+
+      - name: Azure Logout
+        if: always()
+        run: az logout
