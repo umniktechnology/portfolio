@@ -7,9 +7,8 @@ project  = "portfolio"
 owner    = "hendi"
 location = "eastus2"
 
-# Run this to get your SP object ID:
-# az ad sp show --id <YOUR_CLIENT_APP_ID> --query id --output tsv
-sp_object_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+# az ad sp show --id --query id --output tsv
+sp_object_id = "c7930de8-458b-4cff-b11e-b6879c2bf73d"
 
 tags = {
   contact = "hendi@umniktech.com"
