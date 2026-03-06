@@ -37,11 +37,11 @@ export default function Home() {
           </p>
 
           <a
-            href="mailto:hendi.valentino@outlook.com"
+            href="mailto:hendi@umniktech.com"
             className="inline-block px-7 py-3 rounded-lg border border-accent text-accent font-medium hover:bg-accent hover:text-white transition-all duration-200 hover:shadow-glow-accent-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             aria-label="Send an email to Hendi Valentino"
           >
-            hendi.valentino@outlook.com
+            hendi@umniktech.com
           </a>
 
           {/* ─── Social links ─────────────────────────────────── */}

@@ -1,7 +1,7 @@
 # Portfolio Deployment Runbook
 
 **Owner:** Hendi Valentino  
-**Project:** Personal Portfolio — Next.js + Azure Storage + CDN  
+**Project:** Personal Portfolio — Next.js + Azure Storage Static Website  
 **Last updated:** 2026-03-06
 
 ---
@@ -16,15 +16,19 @@ Your machine (dev)
       ▼
   GitHub repo
       │
-      ├─ push → dev    ──► GitHub Actions ──► Azure Storage DEV   (raw HTTP URL)
-      ├─ push → test   ──► GitHub Actions ──► Azure Storage TEST  (CDN HTTPS)
-      └─ push → main   ──► ⏸ Approval ──────► Azure Storage PROD  (CDN HTTPS)
+      ├─ push → dev    ──► GitHub Actions ──► Azure Storage DEV   (HTTPS storage URL)
+      ├─ push → test   ──► GitHub Actions ──► Azure Storage TEST  (HTTPS storage URL)
+      └─ push → main   ──► ⏸ Approval ──────► Azure Storage PROD  (HTTPS storage URL)
 
 infra/ changes on main ──► Terraform workflow ──► provisions/updates Azure resources
 ```
 
+> **No CDN required.** Azure Storage static websites serve over HTTPS natively at no extra cost.
+> Azure CDN (classic) was retired in 2025 — new profiles can no longer be created. If you
+> need global edge caching in the future, use Azure Front Door Standard (~$35/month).
+
 **Estimated time to complete this runbook: 45–60 minutes**  
-**Estimated monthly Azure cost: < $3 USD**
+**Estimated monthly Azure cost: < $2 USD**
 
 ---
 
@@ -151,7 +155,7 @@ az role assignment create \
   --scope /subscriptions/YOUR_SUBSCRIPTION_ID
 ```
 
-> **Why Contributor?** Terraform needs to create resource groups, storage accounts, and CDN profiles. You can scope this more tightly once everything is provisioned.
+> **Why Contributor?** Terraform needs to create resource groups and storage accounts. You can scope this more tightly once everything is provisioned.
 
 ### Step 3.4 — Add OIDC federated credentials (no rotating secrets)
 
@@ -227,7 +231,7 @@ chmod +x infra/scripts/bootstrap.sh
 ./infra/scripts/bootstrap.sh
 
 # On Windows PowerShell (alternative):
-az group create --name rg-portfolio-tfstate --location southeastasia
+az group create --name rg-portfolio-tfstate --location eastus2
 
 az storage account create `
   --name tfstatehendivalentino `
@@ -261,11 +265,11 @@ Open `terraform.tfvars` and fill in your values:
 ```hcl
 project      = "portfolio"
 owner        = "hendi"
-location     = "southeastasia"
+location     = "eastus2"
 sp_object_id = "YOUR_SP_OBJECT_ID"   # from Phase 3 Step 3.2
 
 tags = {
-  contact = "hendi.valentino@outlook.com"
+  contact = "hendi@umniktech.com"
 }
 ```
 
@@ -288,11 +292,9 @@ terraform plan -var-file=terraform.tfvars
 Review the plan. You should see:
 - 1 resource group (`rg-portfolio-hendi`)
 - 3 storage accounts (dev, test, prod)
-- 3 role assignments
-- 1 CDN profile
-- 2 CDN endpoints (test, prod)
+- 3 role assignments (Storage Blob Data Contributor per env)
 
-**Total: ~10 resources to add**
+**Total: ~7 resources to add**
 
 ### Step 5.4 — Apply (provision the infrastructure)
 
@@ -310,13 +312,7 @@ After apply completes, run:
 terraform output github_secrets_summary
 ```
 
-This prints all the secret values you need for GitHub. **Copy this output.**
-
-Also note the CDN URLs:
-
-```bash
-terraform output cdn_endpoints
-```
+This prints all secret values and the live URLs for each environment. **Copy this output.**
 
 ---
 
@@ -338,9 +334,6 @@ Click **New repository secret** for each of these:
 | `AZURE_STORAGE_ACCOUNT_DEV` | From terraform output |
 | `AZURE_STORAGE_ACCOUNT_TEST` | From terraform output |
 | `AZURE_STORAGE_ACCOUNT_PROD` | From terraform output |
-| `AZURE_CDN_PROFILE_NAME` | From terraform output |
-| `AZURE_CDN_ENDPOINT_TEST` | From terraform output |
-| `AZURE_CDN_ENDPOINT_PROD` | From terraform output |
 
 ### Step 6.2 — Create GitHub Environments
 
@@ -391,14 +384,7 @@ git merge dev
 git push origin test
 ```
 
-Watch **Deploy — TEST** run. Once complete, open the CDN URL from:
-
-```bash
-cd infra && terraform output cdn_endpoints
-# Use the "test" value
-```
-
-Allow 2–5 minutes for CDN propagation on first run.
+Watch **Deploy — TEST** run. Once complete, the workflow prints the TEST storage URL. Open it in your browser to verify.
 
 ### Step 7.3 — Promote to PRODUCTION
 
@@ -413,7 +399,7 @@ git push origin main
 3. Check `production` → click **Approve and deploy**
 4. Wait for the workflow to complete
 
-Your site is now live at the production CDN URL! 🚀
+Your site is now live at the production storage URL! 🚀
 
 ---
 
@@ -421,24 +407,35 @@ Your site is now live at the production CDN URL! 🚀
 
 ### Step 8.1 — Check all three environments
 
+Run the following to get each environment's live URL:
+
 ```bash
-# DEV — raw storage URL (HTTP)
+# All URLs at once
+cd infra && terraform output storage_web_endpoints
+
+# Or individually
 az storage account show \
   --name portfoliohendidev \
   --resource-group rg-portfolio-hendi \
-  --query "primaryEndpoints.web" \
-  --output tsv
+  --query "primaryEndpoints.web" --output tsv
 
-# TEST + PROD — CDN URLs (HTTPS)
-cd infra && terraform output cdn_endpoints
+az storage account show \
+  --name portfoliohenditest \
+  --resource-group rg-portfolio-hendi \
+  --query "primaryEndpoints.web" --output tsv
+
+az storage account show \
+  --name portfoliohendiprod \
+  --resource-group rg-portfolio-hendi \
+  --query "primaryEndpoints.web" --output tsv
 ```
 
 Open each URL and confirm the site loads correctly.
 
-### Step 8.2 — Verify CDN HTTPS
+### Step 8.2 — Verify HTTPS is working
 
-- Open the TEST and PROD CDN URLs in your browser
-- Confirm the padlock (HTTPS) is showing
+- Open each storage URL in your browser
+- Confirm the padlock (HTTPS) is showing — Azure Storage static websites serve HTTPS natively
 - Confirm all sections load: Hero, About, Skills, Projects, Contact
 
 ### Step 8.3 — Verify GitHub Actions secrets are working
@@ -470,7 +467,7 @@ Once set up, this is how you work every day:
    └─ git push origin test
        └─ TEST deploys automatically ✅
 
-5. Test on TEST CDN URL — everything good?
+5. Test on TEST URL — everything good?
 
 6. Promote to PRODUCTION
    ├─ git checkout main
@@ -485,7 +482,7 @@ Once set up, this is how you work every day:
 
 ## Terraform Changes Workflow
 
-When you need to change Azure infrastructure (add a custom domain, change CDN settings, etc.):
+When you need to change Azure infrastructure (add a custom domain, adjust storage settings, etc.):
 
 ```
 1. Edit files in infra/
@@ -511,8 +508,9 @@ When you need to change Azure infrastructure (add a custom domain, change CDN se
 - Check `AZURE_STORAGE_ACCOUNT_DEV/TEST/PROD` secret values match Terraform output
 
 ### CDN shows old content after deploy
-- CDN purge runs automatically in the workflows
-- If still stale, run manually: `az cdn endpoint purge --resource-group rg-portfolio-hendi --profile-name cdn-portfolio-hendi --name portfolio-hendi-prod --content-paths "/*"`
+- There is no CDN in this setup — content is served directly from Azure Storage
+- Azure Storage serves the latest uploaded blobs immediately with no cache layer
+- If your browser shows old content, do a hard refresh: Ctrl+Shift+R (Windows) / Cmd+Shift+R (Mac)
 
 ### Terraform init fails: "Backend configuration changed"
 - Run `terraform init -reconfigure`
@@ -526,11 +524,13 @@ When you need to change Azure infrastructure (add a custom domain, change CDN se
 ## Useful Commands Reference
 
 ```bash
-# See live DEV URL
-az storage account show --name portfoliohendidev --resource-group rg-portfolio-hendi --query "primaryEndpoints.web" --output tsv
+# Get all environment URLs at once
+cd infra && terraform output storage_web_endpoints
 
-# Manually purge CDN (prod)
-az cdn endpoint purge --resource-group rg-portfolio-hendi --profile-name cdn-portfolio-hendi --name portfolio-hendi-prod --content-paths "/*"
+# Get individual storage URL
+az storage account show --name portfoliohendidev --resource-group rg-portfolio-hendi --query "primaryEndpoints.web" --output tsv
+az storage account show --name portfoliohenditest --resource-group rg-portfolio-hendi --query "primaryEndpoints.web" --output tsv
+az storage account show --name portfoliohendiprod --resource-group rg-portfolio-hendi --query "primaryEndpoints.web" --output tsv
 
 # Check Terraform state
 cd infra && terraform show

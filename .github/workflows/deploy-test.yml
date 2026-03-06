@@ -55,17 +55,6 @@ jobs:
             --destination '$web' \
             --overwrite true
 
-      # ── Purge CDN so testers don't see cached old version ─────────
-      # Only runs if CDN secrets are present (CDN is optional for TEST)
-      - name: Purge Azure CDN cache (TEST)
-        if: ${{ secrets.AZURE_CDN_ENDPOINT_TEST != '' }}
-        run: |
-          az cdn endpoint purge \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --profile-name ${{ secrets.AZURE_CDN_PROFILE_NAME }} \
-            --name ${{ secrets.AZURE_CDN_ENDPOINT_TEST }} \
-            --content-paths "/*"
-
       - name: Print TEST URL
         run: |
           echo "✅ Deployed to TEST:"

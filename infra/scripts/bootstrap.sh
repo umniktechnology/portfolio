@@ -17,7 +17,7 @@ set -euo pipefail
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 RESOURCE_GROUP="rg-portfolio-tfstate"
-LOCATION="southeastasia"
+LOCATION="eastus2"   # East US 2
 STORAGE_ACCOUNT="tfstatehendivalentino"   # must be globally unique, 3-24 lowercase alphanum
 CONTAINER_NAME="tfstate"
 
