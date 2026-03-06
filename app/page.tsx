@@ -44,45 +44,21 @@ export default function Home() {
             hendi@umniktech.com
           </a>
 
-          {/* ─── Social links ─────────────────────────────────── */}
+          {/* ─── Social links (commented out) ─────────────────────
           <nav aria-label="Social links" className="mt-10">
             <ul className="flex justify-center gap-6 text-sm text-secondary" role="list">
               <li>
-                <a
-                  href="https://github.com/hendivalentino"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors duration-200"
-                  aria-label="GitHub profile"
-                >
-                  GitHub
-                </a>
+                <a href="https://github.com/hendivalentino" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-200" aria-label="GitHub profile">GitHub</a>
               </li>
               <li>
-                <a
-                  href="https://www.linkedin.com/in/hendi-valentino-507b36126/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors duration-200"
-                  aria-label="LinkedIn profile"
-                >
-                  LinkedIn
-                </a>
+                <a href="https://www.linkedin.com/in/hendi-valentino-507b36126/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-200" aria-label="LinkedIn profile">LinkedIn</a>
               </li>
               <li>
-                <a
-                  href="https://twitter.com/hendivalentino"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors duration-200"
-                  aria-label="Twitter / X profile"
-                >
-                  Twitter
-                </a>
+                <a href="https://twitter.com/hendivalentino" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-200" aria-label="Twitter / X profile">Twitter</a>
               </li>
-              {/* add / remove social links as needed */}
             </ul>
           </nav>
+          ───────────────────────────────────────────────────── */}
 
           <p className="mt-12 text-xs text-secondary/60">
             © {new Date().getFullYear()} Hendi Valentino. All rights reserved.
