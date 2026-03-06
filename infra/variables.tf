@@ -19,7 +19,7 @@ variable "location" {
 variable "environments" {
   description = "List of environments to provision."
   type        = list(string)
-  default     = ["dev", "test", "prod"]
+  default     = ["test", "prod"]
 }
 
 variable "sp_object_id" {

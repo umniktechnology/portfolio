@@ -26,12 +26,10 @@ output "github_secrets_summary" {
   value = <<-EOT
     ── GitHub Actions Secrets ──────────────────────────────────────
     AZURE_RESOURCE_GROUP          = ${azurerm_resource_group.portfolio.name}
-    AZURE_STORAGE_ACCOUNT_DEV     = ${azurerm_storage_account.env["dev"].name}
     AZURE_STORAGE_ACCOUNT_TEST    = ${azurerm_storage_account.env["test"].name}
     AZURE_STORAGE_ACCOUNT_PROD    = ${azurerm_storage_account.env["prod"].name}
 
     ── Live URLs ────────────────────────────────────────────────────
-    DEV   = ${azurerm_storage_account.env["dev"].primary_web_endpoint}
     TEST  = ${azurerm_storage_account.env["test"].primary_web_endpoint}
     PROD  = ${azurerm_storage_account.env["prod"].primary_web_endpoint}
     ────────────────────────────────────────────────────────────────
