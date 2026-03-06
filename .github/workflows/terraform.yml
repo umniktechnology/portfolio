@@ -97,11 +97,11 @@ jobs:
       - name: Terraform Plan
         id: plan
         run: |
+          set -o pipefail
           terraform plan \
             -input=false \
             -no-color \
             -out=tfplan 2>&1 | tee plan_output.txt
-          echo "exitcode=$?" >> $GITHUB_OUTPUT
 
       # ── Post plan as PR comment ────────────────────────────────────────────
       - name: Post Plan to PR
