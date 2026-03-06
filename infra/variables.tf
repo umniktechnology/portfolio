@@ -13,19 +13,13 @@ variable "owner" {
 variable "location" {
   description = "Azure region for all resources."
   type        = string
-  default     = "southeastasia"
+  default     = "eastus2"
 }
 
 variable "environments" {
   description = "List of environments to provision."
   type        = list(string)
   default     = ["dev", "test", "prod"]
-}
-
-variable "cdn_environments" {
-  description = "Environments that get a CDN endpoint (dev uses raw storage URL)."
-  type        = list(string)
-  default     = ["test", "prod"]
 }
 
 variable "sp_object_id" {

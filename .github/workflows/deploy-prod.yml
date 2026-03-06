@@ -3,7 +3,6 @@
 #
 # Trigger : push to `main`  OR  manual dispatch
 # Target  : Azure Storage Account (static website) — prod
-#           + Azure CDN Standard Microsoft (HTTPS, global edge)
 #
 # 🔒 PROTECTED: GitHub Environment "production" requires a manual
 #    reviewer approval before this job runs.
@@ -74,24 +73,14 @@ jobs:
             --destination '$web' \
             --overwrite true
 
-      # ── Purge CDN edge cache so users get the new version ─────────
-      - name: Purge Azure CDN cache (PROD)
-        run: |
-          az cdn endpoint purge \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --profile-name ${{ secrets.AZURE_CDN_PROFILE_NAME }} \
-            --name ${{ secrets.AZURE_CDN_ENDPOINT_PROD }} \
-            --content-paths "/*"
-
       - name: Print PROD URL
         run: |
           echo "🚀 Live at:"
-          az cdn endpoint show \
+          az storage account show \
+            --name ${{ secrets.AZURE_STORAGE_ACCOUNT_PROD }} \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --profile-name ${{ secrets.AZURE_CDN_PROFILE_NAME }} \
-            --name ${{ secrets.AZURE_CDN_ENDPOINT_PROD }} \
-            --query "hostName" \
-            --output tsv | awk '{print "https://" $0}'
+            --query "primaryEndpoints.web" \
+            --output tsv
 
       - name: Azure Logout
         if: always()
