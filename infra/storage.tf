@@ -41,4 +41,8 @@ resource "azurerm_role_assignment" "deploy_sp" {
   scope                = azurerm_storage_account.env[each.key].id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = var.sp_object_id
+
+  # Skip AAD propagation check — avoids Terraform hanging for 30+ minutes
+  # waiting for Azure AD to replicate the assignment across all nodes.
+  skip_service_principal_aad_check = true
 }
