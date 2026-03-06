@@ -103,7 +103,7 @@ export default function Projects() {
           className="mb-14"
         >
           <p className="text-xs font-semibold tracking-widest uppercase mb-3 gradient-text-accent inline-block">
-            What I've built
+            What I&apos;ve built
           </p>
           <h2
             id="projects-heading"
