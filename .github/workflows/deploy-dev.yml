@@ -61,11 +61,8 @@ jobs:
       - name: Print DEV URL
         run: |
           echo "✅ Deployed to DEV:"
-          az storage account show \
-            --name ${{ secrets.AZURE_STORAGE_ACCOUNT_DEV }} \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --query "primaryEndpoints.web" \
-            --output tsv
+          echo "https://${{ secrets.AZURE_STORAGE_ACCOUNT_DEV }}.z13.web.core.windows.net/"
+          echo "(if the URL above returns 404, check the zone number in your Azure Portal → Storage account → Static website)"
 
       - name: Azure Logout
         if: always()
