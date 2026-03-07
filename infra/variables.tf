@@ -27,3 +27,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "sp_object_id" {
+  description = "Service principal object ID reserved for identity/RBAC wiring."
+  type        = string
+  default     = null
+}
