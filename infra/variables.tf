@@ -22,15 +22,6 @@ variable "environments" {
   default     = ["test", "prod"]
 }
 
-variable "sp_object_id" {
-  description = <<-EOT
-    Object ID of the Service Principal (or Managed Identity) used by GitHub
-    Actions to upload files to Azure Blob Storage.
-    Find it with: az ad sp show --id <appId> --query id --output tsv
-  EOT
-  type        = string
-}
-
 variable "tags" {
   description = "Additional tags merged into every resource."
   type        = map(string)

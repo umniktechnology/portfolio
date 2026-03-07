@@ -2,7 +2,7 @@
 # Deploy — PRODUCTION environment
 #
 # Trigger : push to `main`  OR  manual dispatch
-# Target  : Azure Storage Account (static website) — prod
+# Target  : Azure Static Web Apps — prod
 #
 # 🔒 PROTECTED: GitHub Environment "production" requires a manual
 #    reviewer approval before this job runs.
@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -44,41 +46,12 @@ jobs:
       - name: Build (static export → out/)
         run: npm run build
 
-      - name: Confirm build artefact
-        run: |
-          echo "📦 Files to deploy:"
-          find out/ -type f | wc -l
-          echo "files"
-
-      - name: Azure Login
-        uses: azure/login@v2
+      - name: Deploy to Azure Static Web Apps (PROD)
+        uses: Azure/static-web-apps-deploy@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      # ── Wipe old files first, then upload fresh build ─────────────
-      # This prevents stale files from old builds lingering in storage
-      - name: Clear old blobs (PROD)
-        run: |
-          az storage blob delete-batch \
-            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_PROD }} \
-            --auth-mode login \
-            --source '$web'
-
-      - name: Upload to Azure Blob Storage (PROD)
-        run: |
-          az storage blob upload-batch \
-            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_PROD }} \
-            --auth-mode login \
-            --source out/ \
-            --destination '$web' \
-            --overwrite true
-
-      - name: Print PROD URL
-        run: |
-          echo "🚀 Live at PROD:"
-          echo "https://${{ secrets.AZURE_STORAGE_ACCOUNT_PROD }}.z13.web.core.windows.net/"
-          echo "(if the URL above returns 404, check the zone number in your Azure Portal → Storage account → Static website)"
-
-      - name: Azure Logout
-        if: always()
-        run: az logout
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_PROD }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "/"
+          output_location: "out"
+          skip_app_build: true
