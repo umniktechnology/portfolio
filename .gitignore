@@ -9,7 +9,8 @@ npm-debug.log*
 # ── Terraform ────────────────────────────────────────────────────
 infra/.terraform/
 infra/.terraform.lock.hcl
-infra/terraform.tfvars        # contains sensitive values — never commit
+# contains sensitive values - never commit
+infra/terraform.tfvars
 infra/tfplan
 infra/*.tfstate
 infra/*.tfstate.backup
