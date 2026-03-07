@@ -38,9 +38,6 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Build (static export → out/)
-        run: npm run build
-
       - name: Deploy to Azure Static Web Apps (TEST)
         uses: Azure/static-web-apps-deploy@v1
         with:
@@ -49,4 +46,4 @@ jobs:
           action: "upload"
           app_location: "/"
           output_location: "out"
-          skip_app_build: true
+          app_build_command: "npm ci && npm run build"
